@@ -1,28 +1,29 @@
 #include <iostream>
 #include <vector>
 #include <conio.h>
-
+#include <algorithm>
 #include "Movie.h"
 
 // https://github.com/seleznevae/libfort/wiki/Table-life-cycle-(CPP-API)
 #include "fort.hpp"
-#include <algorithm>
 
 using namespace std;
 
+vector<Movie> movies;
 int playerCount = 12;
+
 vector<Movie> FetchMovies();
-void DrawTable(vector<Movie>& movies);
-void AddMovie(vector<Movie>& movies);
-void RemoveMovie(vector<Movie>& movies);
+void DrawTable();
+void AddMovie();
+void ClearWindow();
+void RemoveMovie();
+void UpdateMovie();
 bool CompareRankings(Movie& m1, Movie& m2);
 
 int main()
 {
-	// PLAYER HIGH SCORE LIST 
-
-	vector<Movie> movies = FetchMovies();
-	DrawTable(movies);
+	//movies = FetchMovies();
+	DrawTable();
 
 	bool appRunning = true;
 	while (appRunning)
@@ -39,11 +40,15 @@ int main()
 		switch (toupper(inputChar[0]))
 		{
 			case 'A':
-				AddMovie(movies);
+				AddMovie();
 				break;
 
 			case 'R':
-				RemoveMovie(movies);
+				RemoveMovie();
+				break;
+
+			case 'U':
+				UpdateMovie();
 				break;
 			
 			case 'Q':
@@ -51,17 +56,16 @@ int main()
 				appRunning = false;
 				break;
 		}	
-	}	
-	
+	}		
 	return 0;
 }
 
-bool CompareRankings(Movie &m1, Movie &m2)
+bool CompareRankings(Movie& m1, Movie& m2)
 {
 	return (m1.ranking > m2.ranking);
 }
 
-void AddMovie(vector<Movie> &movies) 
+void AddMovie()
 {
 	string inputString = "";
 	float ranking = 0;
@@ -93,20 +97,41 @@ void AddMovie(vector<Movie> &movies)
 
 	sort(movies.begin(), movies.end(), CompareRankings);
 
-	cout.flush();
-	system("cls");
+	ClearWindow();
 
-	DrawTable(movies);
+	DrawTable();
 }
 
-void RemoveMovie(vector<Movie>& movies)
+void RemoveMovie()
 {
 	int moviePosition = 0;
-	cout << "Give rank of movie to remove:";
+	cout << "Give rank of movie to UPDATE:";
 	cin >> moviePosition;
 	movies.erase(movies.begin() + moviePosition - 1);
 
-	DrawTable(movies);
+	DrawTable();
+}
+
+void UpdateMovie()
+{
+	int moviePosition = 0;
+	cout << "Give rank of movie to UPDATE:";
+	cin >> moviePosition;
+
+	moviePosition--;
+	Movie& m = movies[moviePosition];
+
+	string newTitle;
+	cout << "Change '" << m.title << "' title to: ";
+	cin >> newTitle;
+	m.title = newTitle;
+
+	int newRanking;
+	cout << "Change '" << m.title << "' ranking from " << m.ranking << " to: ";
+	cin >> newRanking;
+	m.ranking = newRanking;
+
+	DrawTable();
 }
 
 vector<Movie> FetchMovies()
@@ -123,10 +148,15 @@ vector<Movie> FetchMovies()
 	return movies;
 }
 
-void DrawTable(vector<Movie> &movies)
+void ClearWindow()
 {
 	cout.flush();
 	system("cls");
+}
+
+void DrawTable()
+{
+	ClearWindow();
 
 	fort::char_table table;
 	table << fort::header
@@ -141,5 +171,6 @@ void DrawTable(vector<Movie> &movies)
 	cout << "Commands:\n" <<
 		"A- Add a movie\n" <<
 		"R - Remove movie\n" <<
+		"U - Update movie\n" <<
 		"Q - Quit application\n";
 }
