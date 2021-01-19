@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Fix for githubs incorrect language detection
+*.h linguist-language=C++
+*.cpp linguist-language=C++
